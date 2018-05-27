@@ -1,0 +1,11 @@
+beach
+chaparral
+desert
+forest
+island
+lake
+meadow
+mountain
+river
+seaice
+wetland

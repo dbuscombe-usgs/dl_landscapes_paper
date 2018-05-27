@@ -1,0 +1,4 @@
+rock
+sand
+veg
+water

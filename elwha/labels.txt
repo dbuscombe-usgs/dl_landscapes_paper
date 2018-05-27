@@ -1,0 +1,6 @@
+sediment
+shadow
+terrain
+veg
+water
+wood
