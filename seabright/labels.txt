@@ -1,0 +1,7 @@
+anthro
+foam
+road
+sand
+terrain
+veg
+water
