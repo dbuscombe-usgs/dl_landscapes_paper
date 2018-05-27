@@ -309,7 +309,7 @@ if __name__ == '__main__':
    tile = 96
    winprop = 1.0
    direc = 'test'
-   prob_thres = .7
+   prob_thres = 0.5
    n_iter = 10
    compat_col = 100
    theta = 100
