@@ -68,7 +68,75 @@ def getCP(tmp, graph):
 
    return top_k[0], results[top_k[0]], results[top_k] #, np.std(tmp[:,:,0])
 
+# =========================================================
+def getCP_shift(result, Zx, Zy, k, shift, graph):
 
+   input_name = "import/Placeholder" #input" 
+   output_name = "import/final_result" 
+
+   input_operation = graph.get_operation_by_name(input_name);
+   output_operation = graph.get_operation_by_name(output_name);
+
+   results = []
+   with tf.Session(graph=graph) as sess:
+      results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k], :], axis=0)}))
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k], :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k], :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k]+shift, :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k]-shift, :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k]-shift, :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k]-shift, :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k]+shift, :], axis=0)}))
+      except:
+         pass
+      try:
+         results.append(sess.run(output_operation.outputs[0],
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k]+shift, :], axis=0)}))
+      except:
+         pass
+
+   if len(results)>1:
+      results = np.squeeze(results)
+      #results = np.mean(results, axis=0)
+      w=np.ones(len(results))
+      w[0]=2
+      results = np.average(results, axis=0, weights=w) 
+   else:
+      results = np.squeeze(results)
+
+   # Sort to show labels of first prediction in order of confidence
+   top_k = results.argsort()[-len(results):][::-1]
+
+   return top_k[0], results[top_k[0]], results[top_k] ##, results[top_k[0]] - results[top_k[1]]
+  
+   
 # =========================================================
 def norm_im(image_path):
    input_mean = 0 #128
@@ -188,12 +256,26 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    print('CNN ... ')
    graph = load_graph(classifier_file)
 
+
+#   w1 = []
+#   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
+#   if decim>1:
+#      Z = Z[::decim]
+#   for i in range(len(Z)):
+#      w1.append(getCP(Z[i], graph))
+
+   overlap = 50
+
    w1 = []
-   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
-   if decim>1:
-      Z = Z[::decim]
-   for i in range(len(Z)):
-      w1.append(getCP(Z[i], graph))
+   if overlap>0:
+      shift = int(tile*overlap/100)
+      for i in range(len(Zx)):
+         w1.append(getCP_shift(result, Zx, Zy, i, shift, graph))
+   else:
+      Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
+      for i in range(len(Z)):
+         w1.append(getCP(Z[i], graph))
+
 
 
    ##C=most likely, P=prob, PP=all probs
@@ -310,13 +392,13 @@ if __name__ == '__main__':
    winprop = 1.0
    direc = 'test'
    prob_thres = 0.5
-   n_iter = 10
+   n_iter = 20
    compat_col = 100
-   theta = 100
+   theta = 60 #100
    scale = 1
-   decim = 4
+   decim = 2
    fct =  0.25 
-   compat_spat = 13
+   compat_spat = 5 #2
    class_file = 'labels.txt'
    prob = 0.5
    #=============================================
@@ -355,7 +437,7 @@ if __name__ == '__main__':
    cmap1[tmp] = '#696969'
 
 
-   max_proc = 8
+   max_proc = 2
 
    cmap1 = colors.ListedColormap(cmap1)
 
