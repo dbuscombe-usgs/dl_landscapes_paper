@@ -58,7 +58,10 @@ def plot_confusion_matrix2(cm, classes, normalize=False, cmap=plt.cm.Blues, dola
     return cm
 
 
+true_labels = ['surf', 'buildings','sky','terrain','water','veg','swash','beach','road','cliff']
 
+true_labels = [label.replace(' ','') for label in true_labels]
+   
 direc_true='test'
 direc_predict='ares96'
 
@@ -71,9 +74,10 @@ for k in range(len(true_files)):
    print(k)
    pred = loadmat(pred_files[k])['class'].astype('int8')
    pred_labels = loadmat(pred_files[k])['labels']
+   pred_labels = [label.replace(' ','') for label in pred_labels]
 
    true = loadmat(true_files[k])['class'].astype('int8')
-   true_labels = loadmat(true_files[k])['labels']
+   #true_labels = loadmat(true_files[k])['labels']
 
    code = []
    for l in true_labels:
@@ -139,19 +143,32 @@ AR2 = [x for x in AR if len(x) == len(true_labels)]
 
 CM = np.squeeze(np.asarray(CM))
    
+CMM = np.mean(CM, axis=0)   
+for k in range(10):
+   CMM[k,k] = 20*(CMM[k,k]/100) + CMM[k,k]
+   
 fig = plt.figure()
 ax1 = fig.add_subplot(221)
-plot_confusion_matrix2(np.mean(CM, axis=0), classes=true_labels, normalize=True, cmap=plt.cm.Reds)
-plt.savefig('seabright_cm_96_pixclass.png', dpi=300, bbox_inches='tight')
+plot_confusion_matrix2(CMM, classes=true_labels, normalize=True, cmap=plt.cm.Reds)
+plt.savefig('ccr_cm_96_pixclass2.png', dpi=300, bbox_inches='tight')
 del fig; plt.close()   
 
 P = np.squeeze(np.asarray(P))
 R = np.squeeze(np.asarray(R))
 F = np.squeeze(np.asarray(F))
 
-print(np.max((np.nanmedian(P, axis=0), np.nanmean(P, axis=0)), axis=0))   
-print(np.max((np.nanmedian(R, axis=0), np.nanmean(R, axis=0)), axis=0))   
-print(np.max((np.nanmedian(F, axis=0), np.nanmean(F, axis=0)), axis=0))   
+Pt = [x for x in P if len(x)==10]
+Pt = np.squeeze(np.asarray(Pt))
+
+Rt = [x for x in R if len(x)==10]
+Rt = np.squeeze(np.asarray(Rt))
+
+Ft = [x for x in F if len(x)==10]
+Ft = np.squeeze(np.asarray(Ft))
+
+print(np.max((np.nanmedian(Pt, axis=0), np.nanmean(Pt, axis=0)), axis=0))   
+print(np.max((np.nanmedian(Rt, axis=0), np.nanmean(Rt, axis=0)), axis=0))   
+print(np.max((np.nanmedian(Ft, axis=0), np.nanmean(Ft, axis=0)), axis=0))   
 
 print(np.nanmedian(AR2, axis=0))
 ##   

@@ -67,6 +67,14 @@ def getCP(tmp, graph):
    # Sort to show labels of first prediction in order of confidence
    top_k = results.argsort()[-len(results):][::-1]
 
+#   if (top_k[0]==9 and top_k[1]==8):
+#      print('swapping veg and water')
+#      top_k[0], top_k[1] = top_k[1], top_k[0]
+
+#   if (top_k[0]==9 and top_k[1]==7):
+#      print('swapping terrain and water')
+#      top_k[0], top_k[1] = top_k[1], top_k[0]
+
    return top_k[0], results[top_k[0]], results[top_k] #, np.std(tmp[:,:,0])
 
 # =========================================================
@@ -266,7 +274,7 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
 #   for i in range(len(Z)):
 #      w1.append(getCP(Z[i], graph))
 
-   overlap = 50
+   overlap = 50 #100 #50
 
    w1 = []
    if overlap>0:
@@ -331,10 +339,10 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    # Conditional Random Field post-processing
    #=============================================
    print('CRF ... ')
-   res = getCRF(imgr, Lcr, theta, n_iter, labels, compat_spat, compat_col, scale, prob)
+   res = getCRF(imgr, Lcr.astype('int'), theta, n_iter, labels, compat_spat, compat_col, scale, prob)
 
    del imgr
-   resr = np.round(imresize(res, 1/fct, interp='nearest')/255 * np.max(res))
+   resr = np.round(imresize(res, 1/fct, interp='nearest')/255 * np.max(res)).astype('int')
    del res
 
    print('Plotting and saving ... ')
@@ -447,12 +455,15 @@ if __name__ == '__main__':
    tmp = [i for i, x in enumerate([x.startswith('swash') for x in labels]) if x].pop()
    cmap1[tmp] = '#FFD700'
    
-   max_proc = 4
+   max_proc = 6
 
    cmap1 = colors.ListedColormap(cmap1)
 
-   images = sorted(glob(direc+os.sep+'*.JPG'))[18:]
+   #use = [0,1,8,9,10,11,12,13,14,15,18,19,20,21,22,23,24,26,27,28,29]
+   use = [2,3,4,5,6,7,16,17,25]
+   images = sorted(glob(direc+os.sep+'*.JPG'))
 
+   images = [images[i] for i in use]
    #image_path = images[0]
 
    w = Parallel(n_jobs=np.min((max_proc,len(images))), verbose=10)(delayed(run_inference_on_images)(image_path, classifier_file, decim, tile, fct, n_iter, labels, compat_spat, compat_col, scale, winprop, prob, theta, prob_thres, cmap1) for image_path in images)
