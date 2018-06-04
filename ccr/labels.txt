@@ -1,0 +1,10 @@
+beach
+buildings
+cliff
+road
+sky
+surf
+swash
+terrain
+veg
+water
