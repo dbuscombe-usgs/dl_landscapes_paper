@@ -444,7 +444,7 @@ if __name__ == '__main__':
 
    # labels.append('shadow')
    
-   max_proc = 8
+   max_proc = 3
 
    cmap1 = colors.ListedColormap(cmap1)
 
