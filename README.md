@@ -19,9 +19,10 @@ U.S. Geological Survey
 Santa Cruz, CA
 aritchie@usgs.gov
 
+
 ## Getting started
 
-### Create a python virtual environment usin conda
+### Create a python virtual environment using conda
 
 ```
 conda create --name tfpy35 python=3.5
@@ -45,16 +46,53 @@ pip install joblib
 pip install tensorflow tensorflow_hub
 ```
 
-## Creating ground truth / label imagery for training/validating a deep neural networks
+
+## File structure
+
+The files are organized by data set
+
+### data/
+This top-level directory contains the python processing scripts, trained models and associated files
+
+
+### data/test
+This directory contains data associated with model testing
+
+
+### data/train
+This directory contains data associated with model training
+
+
+## Data sets
+
+### Seabright
+
+
+### Lake Ontario
+
+
+### NWPU
+
+
+### CCRP
+
+
+### Grand Canyon
+
+
+
+## Workflow
+
+### Creating ground truth / label imagery for training/validating a deep neural networks
 
 Details here 
 
-## Retraining a deep convolutional neural network for image recognition
+### Retraining a deep convolutional neural network for image recognition
 
 Details here 
 
 
-## Using a deep convolutional neural network for semantic segmentation
+### Using a deep convolutional neural network for semantic segmentation
 
 Details here 
 
