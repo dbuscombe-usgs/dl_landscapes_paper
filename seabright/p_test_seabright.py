@@ -1,3 +1,6 @@
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
 #general
 from __future__ import division
@@ -50,9 +53,6 @@ def plot_confusion_matrix2(cm, classes, normalize=False, cmap=plt.cm.Blues, dola
        tick_marks = np.arange(len(classes))
        plt.xticks(tick_marks, classes, fontsize=3) # rotation=45
        plt.yticks(tick_marks, classes, fontsize=3)
-
-       #plt.ylabel('True label',fontsize=6)
-       #plt.xlabel('Estimated label',fontsize=6)
 
     else:
        plt.axis('off')
@@ -169,9 +169,9 @@ def eval_tiles(label, direc, numero, classifier_file, x):
 if __name__ == '__main__':
 
    tile = n = 224
-   numero = 1000 #00 
+   numero = 1000 
 
-   direc='test/tile_224' #96
+   direc='test/tile_96' 
 
    #=============================================
    class_file = 'labels.txt'
@@ -184,18 +184,12 @@ if __name__ == '__main__':
    for label in labels:
       code[label] = [i for i, x in enumerate([x.startswith(label) for x in labels]) if x].pop()
 
-   #classifier_file = 'seabright_mobilenetv2_96_1000_001.pb'
-   classifier_file = 'seabright_mobilenetv2_224_1000_001.pb'
+   classifier_file = 'seabright_mobilenetv2_96_1000_001.pb'
+   #classifier_file = 'seabright_mobilenetv2_224_1000_001.pb'
 
    w = Parallel(n_jobs=-1, verbose=10)(delayed(eval_tiles)(label, direc, numero, classifier_file, code[label]) for label in labels)
    
    E, CM = zip(*w)
-   
-   # E = []; CM = []
-   # for label in labels:
-      # _, _, e, cm = eval_tiles(label, direc, numero, graph, code[label])
-      # E.append(e)
-      # CM.append(cm)
 
    CM = np.asarray(CM)
 

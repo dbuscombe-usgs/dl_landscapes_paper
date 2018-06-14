@@ -1,7 +1,6 @@
-
-#general
-
-#DB - version 3/29/2018 for Woods Hole group
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
 from __future__ import division
 

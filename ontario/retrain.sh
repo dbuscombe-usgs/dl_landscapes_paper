@@ -1,3 +1,6 @@
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
 date
 
@@ -12,9 +15,6 @@ rm -rf /c/tmp/_retrain*
 
 date
 
-##  98.1% (N=3830)
-
-
 
 date
 
@@ -28,6 +28,4 @@ rm -rf /c/tmp/retrain_logs
 rm -rf /c/tmp/_retrain*
 
 date
-
-#  96.2% (N=23480)
 

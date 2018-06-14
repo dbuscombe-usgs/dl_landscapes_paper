@@ -1,5 +1,7 @@
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
-#general
 from __future__ import division
 from joblib import Parallel, delayed
 from glob import glob

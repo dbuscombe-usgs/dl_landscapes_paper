@@ -1,3 +1,6 @@
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
 #general
 from __future__ import division
@@ -96,7 +99,3 @@ if __name__ == '__main__':
 
       w = Parallel(n_jobs=-1, verbose=0, pre_dispatch='2 * n_jobs', max_nbytes=None)(delayed(writeout)(Z[k], C[k], labels, outpath, thres) for k in range(len(Z))) 
 	  
-      # for k in range(len(Z)):
-         # writeout(Z[k], C[k], labels, outpath, thres)	  
-
-

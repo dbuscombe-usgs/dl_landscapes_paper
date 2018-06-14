@@ -1,3 +1,6 @@
+## written by Dr Daniel Buscombe
+## Northern Arizona University
+## daniel.buscombe@nau.edu
 
 from numpy.lib.stride_tricks import as_strided as ast
 import numpy as np
