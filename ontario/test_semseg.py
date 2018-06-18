@@ -44,9 +44,6 @@ def plot_confusion_matrix2(cm, classes, normalize=False, cmap=plt.cm.Blues, dola
        plt.xticks(tick_marks, classes, fontsize=4) # rotation=45
        plt.yticks(tick_marks, classes, fontsize=4)
 
-       #plt.ylabel('True label',fontsize=6)
-       #plt.xlabel('Estimated label',fontsize=6)
-
     else:
        plt.axis('off')
 
@@ -93,11 +90,7 @@ for k in range(len(true_files)):
 	  	  
    pred_recode = np.zeros(np.shape(pred), dtype='int8')
    for kk in range(len(code)):
-      pred_recode[pred==code[kk]] = recode[kk]   
-
-   #plt.subplot(121); plt.imshow(true); plt.colorbar()
-   #plt.subplot(122); plt.imshow(pred_recode); plt.colorbar()
-   #plt.show()	  
+      pred_recode[pred==code[kk]] = recode[kk]   	  
 	  
    truef = median(true, disk(5))
    for i,j in zip(np.unique(true), np.unique(truef)):
@@ -106,10 +99,7 @@ for k in range(len(true_files)):
    predf = median(pred_recode, disk(5))
    for i,j in zip(np.unique(pred_recode), np.unique(predf)):
       predf[predf==j] = i
-	  
-   #plt.subplot(121); plt.imshow(truef); plt.colorbar()
-   #plt.subplot(122); plt.imshow(predf); plt.colorbar()
-   #plt.show()
+
    
    AA = []
    for kk in np.unique(truef):
@@ -161,4 +151,3 @@ print(np.max((np.nanmedian(R, axis=0), np.nanmean(R, axis=0)), axis=0))
 print(np.max((np.nanmedian(F, axis=0), np.nanmean(F, axis=0)), axis=0))   
 
 print(np.mean(AR2, axis=0))
-##   

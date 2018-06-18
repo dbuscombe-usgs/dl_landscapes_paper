@@ -24,7 +24,7 @@ aritchie@usgs.gov
 
 ## Getting started
 
-This is a python workflow that requires installation of some third-party libraries. We recommend you use a virtual environment and the conda platform for installing and managing dependencies
+This is a python workflow that requires installation of some third-party libraries. We recommend you use a virtual environment and the conda platform for installing and managing dependencies. Reproducing the results in the paper will require some experience and familiarity with running and modifying python scripts 
 
 ### Create a python virtual environment using conda
 
@@ -120,20 +120,72 @@ print(dat.keys())
 
 ### Retraining a deep convolutional neural network for image recognition
 
-Details here 
+This script will retrain a pre-trained DCNN architecture accessed through Tensorflow-Hub
+
+First, you must unzip all the zipped folders in the directories. Training and testing image tiles should be arranged as jpeg images within folders, with the folder name corresponding to the class label. The paranet directory should be called either 'train' or 'test'. Example: ccr\train\beach and ccr\train\swash
+
+Then, the usage is
+
+```
+python retrain.py --image_dir "name of directory containing subfolders with image tiles" \
+    --tfhub_module "url of model" \
+    --how_many_training_steps "number of training steps" --learning_rate "learning rate" --output_labels "output file containing labels" --output_graph "output file containing the retrained model"
+```
+
+The full list of available image recognition modules can be found [here](https://www.tensorflow.org/hub/modules/image)
+
+Example usage:
+
+```
+python ccr\retrain.py --image_dir train/tile_96 \
+    --tfhub_module https://tfhub.dev/google/imagenet/mobilenet_v2_100_96/classification/1 \
+    --how_many_training_steps 1000 --learning_rate 0.01 --output_labels labels.txt --output_graph seabright_mobilenetv2_96_3000_001.pb
+```
+
+Or bash or git-bash users might run the provided script, retrain.sh
 
 
-### Using a deep convolutional neural network for semantic segmentation
+### Testing image recognition performance
 
-Details here 
+Example usage:
+
+```
+python nwpu\semseg_crf.py 
+```
+
+This script will search for image tiles under the \test\ folder structure, classify each tile, and then compile statistics about average performance. It will also print a confusion matrix like those that are shown in the manuscript, showing model-observation performance for each class. Mean accuracy, F1 score, and posterior probabilities will be printed to screen. 
 
 
+### Using a deep convolutional neural network and conditional random field for semantic segmentation
 
+Example usage:
 
+```
+python gc\semseg_crf.py 
+```
 
+Tunable parameters:
 
+* tile: tile size. Here, 96 or 224, but that could change if a different DCNN model is retrained
+* winprop: proportion of the tile to be assigned with the class predicted by the DCNN (1=whole tile, 0.5=half the tile, etc)
+* direc: directory with images to test
+* prob_thres: probability threshold for DCNN-estimated classes, values above which are kept for CRF classification. For example, prob_thres=0.5 means that DCNN estimated labels with a posterior probability of less than 0.5 are ignored
+* n_iter: number of CRF iterations (larger = more accurate, to a point where accuracy starts to plateau)
+* theta: CRF parameters (see paper for description)
+* decim: decimation factor. Dictates how many tiles within the image will be classified using the DCNN. For example, decim=2 means half of all tiles will be used, decim=4 means a quarter, etc
+* fct: image downsampling factor. This parameter will downsample the image ahead of pixelwise classification with the CRF. It is for faster predictions. For example, fct=0.5 means the image will be downsampled to half size. All final classifications are rescaled so outputs are the same size (number of pixels) as inputs.
+* class_file: the text file produced by retrain.py containing the DCNN model classes
+* classifier_file: the .pb file produced by retrain.py containing the retrained tensorflow graph
 
+### Testing semantic segmentation performance
 
+Example usage:
+
+```
+python ontario\test_semseg.py 
+```
+
+This script will search for images under the \test\ folder structure and their associated CNN-CRF semantic segmentations, and then compile statistics about average performance for pixelwise classification. It will also print a confusion matrix like those that are shown in the manuscript, showing model-observation performance for each class. Mean precision, recall, F1 score, and class areas (in pixels) will be printed to screen. 
 
 
 

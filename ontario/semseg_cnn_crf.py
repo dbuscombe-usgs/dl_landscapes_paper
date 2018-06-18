@@ -15,7 +15,7 @@ import numpy as np
 from scipy.io import savemat, loadmat
 import pydensecrf.densecrf as dcrf
 from pydensecrf.utils import create_pairwise_bilateral, unary_from_labels, unary_from_softmax
-from skimage.exposure import adjust_gamma
+
 
 #plots
 import matplotlib
@@ -107,7 +107,6 @@ def getCP_shift(result, Zx, Zy, k, shift, graph):
 
    if len(results)>1:
       results = np.squeeze(results)
-      #results = np.mean(results, axis=0)
       w=np.ones(len(results))
       w[0]=2
       results = np.average(results, axis=0, weights=w) 
@@ -118,21 +117,16 @@ def getCP_shift(result, Zx, Zy, k, shift, graph):
    top_k = results.argsort()[-len(results):][::-1]
 
    return top_k[0], results[top_k[0]], results[top_k] ##, results[top_k[0]] - results[top_k[1]]
-
-
-
+  
+  
 # =========================================================
 def getCP(tmp, graph):
   
-   #graph = load_graph(classifier_file)
-
    input_name = "import/Placeholder" #input" 
    output_name = "import/final_result" 
 
    input_operation = graph.get_operation_by_name(input_name);
    output_operation = graph.get_operation_by_name(output_name);
-
-   ###tmp = tf.image.resize_images(tmp, [96, 96])
 
    with tf.Session(graph=graph) as sess:
       results = sess.run(output_operation.outputs[0],
@@ -152,11 +146,8 @@ def norm_im(image_path):
 
    input_name = "file_reader"
    output_name = "normalized"
-   img = imread(image_path) 
-   ##img = adjust_gamma(imread(image_path), 0.5)
+   img = imread(image_path)
    nx, ny, nz = np.shape(img)
-
-   #theta = np.std(img).astype('int')
 
    file_reader = tf.read_file(image_path, input_name)
    image_reader = tf.image.decode_jpeg(file_reader, channels = 3,
@@ -238,8 +229,7 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    # Image pre-processing
    #=============================================
 
-   ##img = imread(image_path) 
-   img = adjust_gamma(imread(image_path), 0.75)
+   img = imread(image_path)
    nx, ny, nz = np.shape(img)
 
    result = norm_im(image_path)
@@ -266,13 +256,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    print('CNN ... ')
    graph = load_graph(classifier_file)
 
-#   w1 = []
-#   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
-#   if decim>1:
-#      Z = Z[::decim]
-#   for i in range(len(Z)):
-#      w1.append(getCP(Z[i], graph))
-
    overlap = 50
 
    w1 = []
@@ -284,7 +267,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
       Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
       for i in range(len(Z)):
          w1.append(getCP(Z[i], graph))
-
 
 
    ##C=most likely, P=prob, PP=all probs
@@ -323,12 +305,8 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
 
    nxo, nyo, nz = np.shape(img)
 
-   Lc[img[:,:,0]<75] = 1
-   Lc[Lp == 0 ] = 0   
-
    Lcorig = Lc.copy()
    Lcorig[Lp < prob_thres] = np.nan
-   #Lcorig[Lc == 0] = np.nan
 
    Lc[np.isnan(Lcorig)] = 0
 
@@ -337,7 +315,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
 
    imgr = imresize(img, fct)
    Lcr = np.round(imresize(Lc, fct, interp='nearest')/255 * np.max(Lc))
-
 
    #=============================================
    # Conditional Random Field post-processing
@@ -348,8 +325,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    del imgr
    resr = np.round(imresize(res, 1/fct, interp='nearest')/255 * np.max(res))
    del res
-
-   #resr[img[:,:,0]<100] = np.nan
 
    print('Plotting and saving ... ')
    #print(name)
@@ -373,7 +348,7 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    divider = make_axes_locatable(ax1)
    cax = divider.append_axes("right", size="5%")
    cb=plt.colorbar(im2, cax=cax)
-   cb.set_ticks(np.arange(len(labels)+1.5)) 
+   cb.set_ticks(np.arange(len(labels)+1)) 
    cb.ax.set_yticklabels(labels)
    cb.ax.tick_params(labelsize=4) 
    plt.axis('tight')
@@ -388,7 +363,7 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    divider = make_axes_locatable(ax1)
    cax = divider.append_axes("right", size="5%")
    cb=plt.colorbar(im2, cax=cax)
-   cb.set_ticks(np.arange(len(labels)+1.5)) 
+   cb.set_ticks(np.arange(len(labels)+1)) 
    cb.ax.set_yticklabels(labels)
    cb.ax.tick_params(labelsize=4)  
    plt.savefig(name+'_ares_'+str(tile)+'.png', dpi=600, bbox_inches='tight')
@@ -398,23 +373,20 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    ###==============================================================
    savemat(name+'_ares_'+str(tile)+'.mat', {'sparse': Lc.astype('int'), 'Lpp': Lpp, 'class': resr.astype('int'), 'labels': labels}, do_compression = True)
 
-   #return resr.astype('int')
-
-
 #==============================================================
 if __name__ == '__main__':
 
-   tile = 96
+   tile = 96 #224
    winprop = 1.0
    direc = 'test'
    prob_thres = 0.5
    n_iter = 20
    compat_col = 100
-   theta = 60
+   theta = 60 #theta_gamma and theta_alpha
    scale = 1
    decim = 2
    fct =  0.25 
-   compat_spat = 5
+   compat_spat = 5 #theta_beta
    class_file = 'labels.txt'
    prob = 0.5
    #=============================================
@@ -427,12 +399,11 @@ if __name__ == '__main__':
    for label in labels:
       code[label] = [i for i, x in enumerate([x.startswith(label) for x in labels]) if x].pop()
 
-   classifier_file = 'gc_mobilenetv2_'+str(tile)+'_1000_001.pb'
-
+   classifier_file = 'ontario_mobilenetv2_'+str(tile)+'_1000_001.pb'
 
    cmap1 = list(labels)   
-   tmp = [i for i, x in enumerate([x.startswith('rock') for x in labels]) if x].pop()
-   cmap1[tmp] = '#FF8C00'
+   tmp = [i for i, x in enumerate([x.startswith('terrain') for x in labels]) if x].pop()
+   cmap1[tmp] = '#D2691E'
 
    tmp = [i for i, x in enumerate([x.startswith('veg') for x in labels]) if x].pop()
    cmap1[tmp] = 'g'
@@ -440,43 +411,21 @@ if __name__ == '__main__':
    tmp = [i for i, x in enumerate([x.startswith('water') for x in labels]) if x].pop()
    cmap1[tmp] = 'b'
 
-   tmp = [i for i, x in enumerate([x.startswith('sand') for x in labels]) if x].pop()
+   tmp = [i for i, x in enumerate([x.startswith('sediment') for x in labels]) if x].pop()
    cmap1[tmp] = '#FFD700'
 
-   # cmap1.append('k')
+   tmp = [i for i, x in enumerate([x.startswith('anthro') for x in labels]) if x].pop()
+   cmap1[tmp] = 'r'
 
-   # labels.append('shadow')
-   
-   max_proc = 3
+
+
+   max_proc = 8
 
    cmap1 = colors.ListedColormap(cmap1)
 
    images = sorted(glob(direc+os.sep+'*.JPG'))
 
-   #image_path = images[0]
-
    w = Parallel(n_jobs=np.min((max_proc,len(images))), verbose=10)(delayed(run_inference_on_images)(image_path, classifier_file, decim, tile, fct, n_iter, labels, compat_spat, compat_col, scale, winprop, prob, theta, prob_thres, cmap1) for image_path in images)
-
-#   C = zip(*w)
-
-#   ares = sorted(glob(direc+os.sep+'*.mat'))
-
-#   A = []
-#   for f in ares:
-#      A.append(loadmat(f)['class'])
-
-#   for k in range(len(A)):
-#      e = precision_recall_fscore_support(A[k].flatten(), C[k].flatten())
-#      print(e)
-#      CM = confusion_matrix(A[k].flatten(), C[k].flatten())
-
-#      CM = np.asarray(CM)
-
-#      fig = plt.figure()
-#      ax1 = fig.add_subplot(221)
-#      plot_confusion_matrix2(CM, classes=labels, normalize=True, cmap=plt.cm.Reds)
-#      plt.savefig(images[k].split(os.sep)[-1]+'test_cm_'+str(tile)+'.png', dpi=300, bbox_inches='tight')
-#      del fig; plt.close()
 
 
 

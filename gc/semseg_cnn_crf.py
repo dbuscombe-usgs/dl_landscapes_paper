@@ -52,7 +52,7 @@ def load_graph(model_file):
 
 
 # =========================================================
-def getCP_shift(result, Zx, Zy, k, shift, graph, tile):
+def getCP_shift(result, Zx, Zy, k, shift, graph):
 
    input_name = "import/Placeholder" #input" 
    output_name = "import/final_result" 
@@ -62,55 +62,46 @@ def getCP_shift(result, Zx, Zy, k, shift, graph, tile):
 
    results = []
    with tf.Session(graph=graph) as sess:
-      tmp = imresize(result[Zx[k], Zy[k], :], [tile, tile])
       results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k], :], axis=0)}))
       try:
-         tmp = imresize(result[Zx[k]+shift, Zy[k], :], [tile, tile])	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k], :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k]-shift, Zy[k], :], [tile, tile])	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k], :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k], Zy[k]+shift, :], [tile, tile])	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k]+shift, :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k], Zy[k]-shift, :], [tile, tile])	  	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k], Zy[k]-shift, :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k]-shift, Zy[k]-shift, :], [tile, tile])	  	  	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k]-shift, :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k]+shift, Zy[k]-shift, :], [tile, tile])	  	  	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k]-shift, :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k]-shift, Zy[k]+shift, :], [tile, tile])	  	  	  	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]-shift, Zy[k]+shift, :], axis=0)}))
       except:
          pass
       try:
-         tmp = imresize(result[Zx[k]+shift, Zy[k]+shift, :], [tile, tile])	  	  	  	  	  
          results.append(sess.run(output_operation.outputs[0],
-                      {input_operation.outputs[0]: np.expand_dims(tmp, axis=0)}))
+                      {input_operation.outputs[0]: np.expand_dims(result[Zx[k]+shift, Zy[k]+shift, :], axis=0)}))
       except:
          pass
 
@@ -131,7 +122,7 @@ def getCP_shift(result, Zx, Zy, k, shift, graph, tile):
 
 
 # =========================================================
-def getCP(tmp, graph, tile):
+def getCP(tmp, graph):
   
    #graph = load_graph(classifier_file)
 
@@ -140,8 +131,6 @@ def getCP(tmp, graph, tile):
 
    input_operation = graph.get_operation_by_name(input_name);
    output_operation = graph.get_operation_by_name(output_name);
-
-   tmp = imresize(tmp, [tile, tile])
 
    with tf.Session(graph=graph) as sess:
       results = sess.run(output_operation.outputs[0],
@@ -162,10 +151,7 @@ def norm_im(image_path):
    input_name = "file_reader"
    output_name = "normalized"
    img = imread(image_path) 
-   ##img = adjust_gamma(imread(image_path), 0.5)
    nx, ny, nz = np.shape(img)
-
-   #theta = np.std(img).astype('int')
 
    file_reader = tf.read_file(image_path, input_name)
    image_reader = tf.image.decode_jpeg(file_reader, channels = 3,
@@ -247,8 +233,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    # Image pre-processing
    #=============================================
 
-   wintile = 96
-   
    ##img = imread(image_path) 
    img = adjust_gamma(imread(image_path), 0.75)
    nx, ny, nz = np.shape(img)
@@ -259,14 +243,14 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
 
    ## pad image so it is divisible by N windows with no remainder 
    result = np.vstack((np.hstack((result,np.fliplr(result))), np.flipud(np.hstack((result,np.fliplr(result))))))
-   result = result[:nxo+np.mod(nxo,wintile),:nyo+np.mod(nyo,wintile), :] 
+   result = result[:nxo+np.mod(nxo,tile),:nyo+np.mod(nyo,tile), :] 
 
    nx, ny, nz = np.shape(result)
 
    gridy, gridx = np.meshgrid(np.arange(ny), np.arange(nx))
 
-   Zx,_ = sliding_window(gridx, (wintile,wintile), (wintile,wintile))
-   Zy,_ = sliding_window(gridy, (wintile,wintile), (wintile,wintile))
+   Zx,_ = sliding_window(gridx, (tile,tile), (tile,tile))
+   Zy,_ = sliding_window(gridy, (tile,tile), (tile,tile))
 
 
    if decim>1:
@@ -277,24 +261,17 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    print('CNN ... ')
    graph = load_graph(classifier_file)
 
-#   w1 = []
-#   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
-#   if decim>1:
-#      Z = Z[::decim]
-#   for i in range(len(Z)):
-#      w1.append(getCP(Z[i], graph))
-
    overlap = 50
 
    w1 = []
    if overlap>0:
-      shift = int(wintile*overlap/100)
+      shift = int(tile*overlap/100)
       for i in range(len(Zx)):
-         w1.append(getCP_shift(result, Zx, Zy, i, shift, graph, tile))
+         w1.append(getCP_shift(result, Zx, Zy, i, shift, graph))
    else:
       Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
       for i in range(len(Z)):
-         w1.append(getCP(Z[i], graph, tile))
+         w1.append(getCP(Z[i], graph))
 
 
 
@@ -359,8 +336,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    del imgr
    resr = np.round(imresize(res, 1/fct, interp='nearest')/255 * np.max(res))
    del res
-
-   #resr[img[:,:,0]<100] = np.nan
 
    print('Plotting and saving ... ')
    #print(name)
@@ -453,41 +428,15 @@ if __name__ == '__main__':
 
    tmp = [i for i, x in enumerate([x.startswith('sand') for x in labels]) if x].pop()
    cmap1[tmp] = '#FFD700'
-
-   # cmap1.append('k')
-
-   # labels.append('shadow')
    
-   max_proc = 8
+   max_proc = 5
 
    cmap1 = colors.ListedColormap(cmap1)
 
    images = sorted(glob(direc+os.sep+'*.JPG'))
 
-   #image_path = images[0]
-
    w = Parallel(n_jobs=np.min((max_proc,len(images))), verbose=10)(delayed(run_inference_on_images)(image_path, classifier_file, decim, tile, fct, n_iter, labels, compat_spat, compat_col, scale, winprop, prob, theta, prob_thres, cmap1) for image_path in images)
 
-#   C = zip(*w)
-
-#   ares = sorted(glob(direc+os.sep+'*.mat'))
-
-#   A = []
-#   for f in ares:
-#      A.append(loadmat(f)['class'])
-
-#   for k in range(len(A)):
-#      e = precision_recall_fscore_support(A[k].flatten(), C[k].flatten())
-#      print(e)
-#      CM = confusion_matrix(A[k].flatten(), C[k].flatten())
-
-#      CM = np.asarray(CM)
-
-#      fig = plt.figure()
-#      ax1 = fig.add_subplot(221)
-#      plot_confusion_matrix2(CM, classes=labels, normalize=True, cmap=plt.cm.Reds)
-#      plt.savefig(images[k].split(os.sep)[-1]+'test_cm_'+str(tile)+'.png', dpi=300, bbox_inches='tight')
-#      del fig; plt.close()
 
 
 

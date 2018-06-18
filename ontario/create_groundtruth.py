@@ -307,8 +307,8 @@ if __name__ == '__main__':
    tile = 128   
 
 
-   labels = ['terrain', 'cliff','water','veg','sky','foam','sand', 'anthro','road']
-   cmap = ['#D2691E', '#8B008B','b','g','c','w','#FFD700','r', '#696969']
+   labels = ['terrain', 'water','veg','sediment', 'anthro']
+   cmap = ['#D2691E', 'b','g','#FFD700','r']
 
    classes = dict(zip(labels, cmap))
 

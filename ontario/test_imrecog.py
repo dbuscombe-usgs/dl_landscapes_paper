@@ -127,7 +127,6 @@ def norm_im(image_path):
       
 
 def eval_tiles(label, direc, numero, classifier_file, x):
-#for label in labels:
    graph = load_graph(classifier_file)
 
    print(label)
@@ -136,8 +135,6 @@ def eval_tiles(label, direc, numero, classifier_file, x):
    Z = []
    for image_path in infiles:
       Z.append(norm_im(image_path))
-
-   #Z = Parallel(n_jobs=-1, verbose=10)(delayed(norm_im)(image_path) for image_path in infiles) 
 
    w1 = []
    for i in range(len(Z)):
@@ -172,8 +169,8 @@ def eval_tiles(label, direc, numero, classifier_file, x):
 if __name__ == '__main__':
 
    tile = n = 224 #96
-   numero = 1000 #00 #500
-
+   numero = 1000 
+   
    direc='test/tile_224'
 
    #=============================================
@@ -194,12 +191,6 @@ if __name__ == '__main__':
    
    E, CM = zip(*w)
    
-   # E = []; CM = []
-   # for label in labels:
-      # _, _, e, cm = eval_tiles(label, direc, numero, graph, code[label])
-      # E.append(e)
-      # CM.append(cm)
-
    CM = np.asarray(CM)
 
    fig = plt.figure()
@@ -208,13 +199,11 @@ if __name__ == '__main__':
    plt.savefig('ontario_cm224.png', dpi=300, bbox_inches='tight')
    del fig; plt.close()
 
-   a=np.asarray(E)[:,0] #[0.838     , 0.973     , 0.97058824, 0.967     , 0.98924731,  0.958     , 0.98513011]
-   f= np.asarray(E)[:,3] #[0.91186072, 0.98631526, 0.98507463, 0.98322318, 0.99459459,   0.97854954, 0.99250936]
-   pr= np.asarray(E)[:,4] #[0.91619498, 0.96486992, 0.95538485, 0.97326571, 0.94936901,   0.95881802, 0.98608196]
+   a=np.asarray(E)[:,0] 
+   f= np.asarray(E)[:,3] 
+   pr= np.asarray(E)[:,4] 
 
    print('mean accuracy. %f' % (np.mean(a)) )
    print('mean Fscore. %f' % (np.mean(f)) )
    print('mean prob. %f' % (np.mean(pr)) )
-   #mean a: 0.954
-   #mean f: 0.976
-   #mean pr: 0.958
+
