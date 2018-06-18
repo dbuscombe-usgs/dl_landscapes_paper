@@ -137,8 +137,6 @@ def eval_tiles(label, direc, numero, classifier_file, x):
    for image_path in infiles:
       Z.append(norm_im(image_path))
 
-   #Z = Parallel(n_jobs=-1, verbose=10)(delayed(norm_im)(image_path) for image_path in infiles) 
-
    w1 = []
    for i in range(len(Z)):
       w1.append(getCP(Z[i], graph))
@@ -193,12 +191,6 @@ if __name__ == '__main__':
    w = Parallel(n_jobs=-1, verbose=10)(delayed(eval_tiles)(label, direc, numero, classifier_file, code[label]) for label in labels)
    
    E, CM = zip(*w)
-   
-   # E = []; CM = []
-   # for label in labels:
-      # _, _, e, cm = eval_tiles(label, direc, numero, graph, code[label])
-      # E.append(e)
-      # CM.append(cm)
 
    CM = np.asarray(CM)
 

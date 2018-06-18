@@ -158,6 +158,8 @@ This script will search for image tiles under the \test\ folder structure, class
 
 ### Using a deep convolutional neural network and conditional random field for semantic segmentation
 
+This script carries out semantic segmentation using a CRF where unary potentials are given by the classification outputs from a trained DCNN model in small regions of the image
+
 Example usage:
 
 ```

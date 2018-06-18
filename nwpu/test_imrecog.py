@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 from joblib import Parallel, delayed, cpu_count
@@ -110,10 +115,6 @@ def norm_im(image_path, tile):
 
    input_name = "file_reader"
    output_name = "normalized"
-   #img = imresize(imread(image_path), (tile, tile, 3))
-   #nx, ny, nz = np.shape(img)
-
-   #theta = np.std(img).astype('int')
 
    file_reader = tf.read_file(image_path, input_name)
    image_reader = tf.image.decode_jpeg(file_reader, channels = 3,
@@ -135,8 +136,6 @@ def eval_tiles(label, direc, numero, classifier_file, x, tile):
    Z = []
    for image_path in infiles:
       Z.append(norm_im(image_path, tile))
-
-   #Z = Parallel(n_jobs=-1, verbose=10)(delayed(norm_im)(image_path) for image_path in infiles) 
 
    w1 = []
    for i in range(len(Z)):
@@ -192,13 +191,6 @@ if __name__ == '__main__':
    w = Parallel(n_jobs=-1, verbose=10)(delayed(eval_tiles)(label, direc, numero, classifier_file, code[label], tile) for label in labels)
    
    E, CM = zip(*w)
-   
-   # E = []; CM = []
-   # for label in labels:
-      # e, cm = eval_tiles(label, direc, numero, classifier_file, code[label], tile)
-      # E.append(e)
-      # CM.append(cm)
-
    CM = np.asarray(CM)
 
    fig = plt.figure()

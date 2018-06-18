@@ -2,19 +2,23 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 from __future__ import division
 
 import sys, getopt, os
 import cv2
 import numpy as np
-from scipy.misc import imsave #imresize, imread
+from scipy.misc import imsave 
 from scipy.io import savemat
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.colors as colors
 from numpy.lib.stride_tricks import as_strided as ast
-#from skimage.morphology import remove_small_objects
 from scipy.stats import mode as md
 import random, string
 import pydensecrf.densecrf as dcrf

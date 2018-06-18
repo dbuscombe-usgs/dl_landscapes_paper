@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 from joblib import Parallel, delayed, cpu_count
@@ -69,14 +74,6 @@ def getCP(tmp, graph):
 
    # Sort to show labels of first prediction in order of confidence
    top_k = results.argsort()[-len(results):][::-1]
-
-#   if (top_k[0]==9 and top_k[1]==8):
-#      print('swapping veg and water')
-#      top_k[0], top_k[1] = top_k[1], top_k[0]
-
-#   if (top_k[0]==9 and top_k[1]==7):
-#      print('swapping terrain and water')
-#      top_k[0], top_k[1] = top_k[1], top_k[0]
 
    return top_k[0], results[top_k[0]], results[top_k] #, np.std(tmp[:,:,0])
 
@@ -269,15 +266,7 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    print('CNN ... ')
    graph = load_graph(classifier_file)
 
-
-#   w1 = []
-#   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
-#   if decim>1:
-#      Z = Z[::decim]
-#   for i in range(len(Z)):
-#      w1.append(getCP(Z[i], graph))
-
-   overlap = 50 #100 #50
+   overlap = 50 
 
    w1 = []
    if overlap>0:
@@ -395,8 +384,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    ###==============================================================
    savemat(name+'_ares_'+str(tile)+'.mat', {'sparse': Lc.astype('int'), 'Lpp': Lpp, 'class': resr.astype('int'), 'labels': labels}, do_compression = True)
 
-   #return resr.astype('int')
-
 
 #==============================================================
 if __name__ == '__main__':
@@ -462,35 +449,8 @@ if __name__ == '__main__':
 
    cmap1 = colors.ListedColormap(cmap1)
 
-   #use = [0,1,8,9,10,11,12,13,14,15,18,19,20,21,22,23,24,26,27,28,29]
-   use = [2,3,4,5,6,7,16,17,25]
    images = sorted(glob(direc+os.sep+'*.JPG'))
 
-   images = [images[i] for i in use]
-   #image_path = images[0]
-
    w = Parallel(n_jobs=np.min((max_proc,len(images))), verbose=10)(delayed(run_inference_on_images)(image_path, classifier_file, decim, tile, fct, n_iter, labels, compat_spat, compat_col, scale, winprop, prob, theta, prob_thres, cmap1) for image_path in images)
-
-#   C = zip(*w)
-
-#   ares = sorted(glob(direc+os.sep+'*.mat'))
-
-#   A = []
-#   for f in ares:
-#      A.append(loadmat(f)['class'])
-
-#   for k in range(len(A)):
-#      e = precision_recall_fscore_support(A[k].flatten(), C[k].flatten())
-#      print(e)
-#      CM = confusion_matrix(A[k].flatten(), C[k].flatten())
-
-#      CM = np.asarray(CM)
-
-#      fig = plt.figure()
-#      ax1 = fig.add_subplot(221)
-#      plot_confusion_matrix2(CM, classes=labels, normalize=True, cmap=plt.cm.Reds)
-#      plt.savefig(images[k].split(os.sep)[-1]+'test_cm_'+str(tile)+'.png', dpi=300, bbox_inches='tight')
-#      del fig; plt.close()
-
 
 

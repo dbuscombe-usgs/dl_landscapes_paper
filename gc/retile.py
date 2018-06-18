@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 from __future__ import division
 from joblib import Parallel, delayed
 from glob import glob

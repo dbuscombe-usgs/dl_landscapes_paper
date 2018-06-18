@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 from joblib import Parallel, delayed
@@ -63,7 +68,6 @@ if __name__ == '__main__':
    outpath = direc+os.sep+'tile_'+str(tile)
    files = sorted(glob(direc+os.sep+'*.mat'))
 
-   #labels = loadmat(files[0])['labels']
    labels = ['surf', 'buildings','sky','terrain','water','veg','swash','beach','road','cliff']
 
    labels = [label.replace(' ','') for label in labels]
@@ -87,10 +91,7 @@ if __name__ == '__main__':
 
       dat = loadmat(f)
       res = dat['class']
-	  
-      #labels = dat['labels']
-      #labels = [label.replace(' ','') for label in labels]	  
-	  
+
       fim = direc+os.sep+f.split(os.sep)[-1].replace('_class.mat','')
 
       print('Generating tiles from dense class map ....')
@@ -100,7 +101,4 @@ if __name__ == '__main__':
 
       w = Parallel(n_jobs=-1, verbose=0, pre_dispatch='2 * n_jobs', max_nbytes=None)(delayed(writeout)(Z[k], C[k], labels, outpath, thres) for k in range(len(Z))) 
 	  
-      # for k in range(len(Z)):
-         # writeout(Z[k], C[k], labels, outpath, thres)	  
-
 

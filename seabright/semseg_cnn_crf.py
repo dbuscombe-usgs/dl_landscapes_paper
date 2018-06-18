@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 from joblib import Parallel, delayed, cpu_count
@@ -53,8 +58,6 @@ def load_graph(model_file):
 # =========================================================
 def getCP(tmp, graph):
   
-   #graph = load_graph(classifier_file)
-
    input_name = "import/Placeholder" #input" 
    output_name = "import/final_result" 
 
@@ -259,14 +262,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    print('CNN ... ')
    graph = load_graph(classifier_file)
 
-
-#   w1 = []
-#   Z,ind = sliding_window(result, (tile,tile,3), (tile, tile,3))
-#   if decim>1:
-#      Z = Z[::decim]
-#   for i in range(len(Z)):
-#      w1.append(getCP(Z[i], graph))
-
    overlap = 50
 
    w1 = []
@@ -385,8 +380,6 @@ def run_inference_on_images(image_path, classifier_file, decim, tile, fct, n_ite
    ###==============================================================
    savemat(name+'_ares_'+str(tile)+'.mat', {'sparse': Lc.astype('int'), 'Lpp': Lpp, 'class': resr.astype('int'), 'labels': labels}, do_compression = True)
 
-   #return resr.astype('int')
-
 
 #==============================================================
 if __name__ == '__main__':
@@ -440,36 +433,14 @@ if __name__ == '__main__':
    cmap1[tmp] = '#696969'
 
 
-   max_proc = 2
+   max_proc = 4
 
    cmap1 = colors.ListedColormap(cmap1)
 
    images = sorted(glob(direc+os.sep+'*.jpg'))
 
-   #image_path = images[0]
-
    w = Parallel(n_jobs=np.min((max_proc,len(images))), verbose=10)(delayed(run_inference_on_images)(image_path, classifier_file, decim, tile, fct, n_iter, labels, compat_spat, compat_col, scale, winprop, prob, theta, prob_thres, cmap1) for image_path in images)
 
-#   C = zip(*w)
-
-#   ares = sorted(glob(direc+os.sep+'*.mat'))
-
-#   A = []
-#   for f in ares:
-#      A.append(loadmat(f)['class'])
-
-#   for k in range(len(A)):
-#      e = precision_recall_fscore_support(A[k].flatten(), C[k].flatten())
-#      print(e)
-#      CM = confusion_matrix(A[k].flatten(), C[k].flatten())
-
-#      CM = np.asarray(CM)
-
-#      fig = plt.figure()
-#      ax1 = fig.add_subplot(221)
-#      plot_confusion_matrix2(CM, classes=labels, normalize=True, cmap=plt.cm.Reds)
-#      plt.savefig(images[k].split(os.sep)[-1]+'test_cm_'+str(tile)+'.png', dpi=300, bbox_inches='tight')
-#      del fig; plt.close()
 
 
 

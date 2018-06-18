@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 import os, time
@@ -80,7 +85,6 @@ for k in range(len(true_files)):
    pred_labels = [label.replace(' ','') for label in pred_labels]
 
    true = loadmat(true_files[k])['class'].astype('int8')
-   #true_labels = loadmat(true_files[k])['labels']
 
    code = []
    for l in true_labels:
@@ -107,9 +111,6 @@ for k in range(len(true_files)):
    for i,j in zip(np.unique(pred_recode), np.unique(predf)):
       predf[predf==j] = i
 	  
-   #plt.subplot(121); plt.imshow(truef); plt.colorbar()
-   #plt.subplot(122); plt.imshow(predf); plt.colorbar()
-   #plt.show()
    
    AA = []
    for kk in np.unique(truef):

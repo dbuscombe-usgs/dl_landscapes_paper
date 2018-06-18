@@ -2,6 +2,11 @@
 ## Northern Arizona University
 ## daniel.buscombe@nau.edu
 
+## from: https://github.com/dbuscombe-usgs/dl_landscapes_paper
+## If you find these codes/data useful, please cite:
+## Buscombe and Ritchie (2018) "Landscape classification with deep neural networks", submitted to Geosciences June 2018
+## https://eartharxiv.org/5mx3c
+
 #general
 from __future__ import division
 from joblib import Parallel, delayed, cpu_count
@@ -133,8 +138,6 @@ def eval_tiles(label, direc, numero, classifier_file, x):
    Z = []
    for image_path in infiles:
       Z.append(norm_im(image_path))
-
-   #Z = Parallel(n_jobs=-1, verbose=10)(delayed(norm_im)(image_path) for image_path in infiles) 
 
    w1 = []
    for i in range(len(Z)):
