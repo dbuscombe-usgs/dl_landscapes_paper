@@ -1,6 +1,6 @@
 # "Landscape classification with deep neural networks" by Daniel Buscombe and Andrew C. Ritchie
 
-An EarthArXiv preprint of this manuscript may be found [here](https://eartharxiv.org/5mx3c)
+This open access manuscript may be found [here](http://www.mdpi.com/2076-3263/8/7/244)
 
 The following document contains a workflow to reproduce the results in the above paper. If you find these data and codes useful in your research, please cite!
 
